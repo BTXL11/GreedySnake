@@ -11,6 +11,7 @@ void Food::generate(int x, int y, int width, int height){
     y = rand() % 480;
     width = rand() % 30;
     height = rand() % 30;
+    size = QSize(width, height);
 
     position = QPoint(x-width/2, y-height/2);
 

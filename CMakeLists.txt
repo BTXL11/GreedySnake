@@ -20,8 +20,11 @@ qt_add_executable(GreedySnake
     component/UpBar.h
     component/GameArea.cpp
     component/GameArea.h
+    component/GameOverDialog.cpp
+    component/GameOverDialog.h
     food/Food.cpp
     food/Food.h
+
 
 )
 

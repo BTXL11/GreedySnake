@@ -1,7 +1,9 @@
 #include "GameArea.h"
+#include "gameOverDialog.h"
 #include "qnamespace.h"
 #include <QPaintEvent>
 #include <QKeyEvent>
+#include <QMessagebox>
 
 GameArea::GameArea(QWidget *parent) : QWidget(parent){
     snake = new Snake();
@@ -14,6 +16,13 @@ GameArea::GameArea(QWidget *parent) : QWidget(parent){
     });
     connect(snake, &Snake::scoreChanged, this, [this](int score){
         emit scoreChanged(score);
+    });
+    connect(this, &GameArea::gameOver, this, [this](){
+        stop();
+        gameOverDialog = new GameOverDialog();
+        gameOverDialog->setWindowTitle("Game Over");
+        gameOverDialog->exec();
+
     });
 }
 
@@ -35,7 +44,7 @@ void GameArea::paintEvent(QPaintEvent *event) {
     for (const QPoint &snake_part : snake->getBody()) {
         painter.setBrush(Qt::green);
         painter.setPen(Qt::NoPen);
-        painter.drawEllipse(snake_part.x() - 5, snake_part.y() - 5, 10, 10);
+        painter.drawEllipse(snake_part.x() - snake->getSize()/2, snake_part.y() - snake->getSize()/2, snake->getSize(), snake->getSize());
     }
 
     // 绘制食物
@@ -45,12 +54,12 @@ void GameArea::paintEvent(QPaintEvent *event) {
 
         painter.setBrush(Qt::red);
         painter.setPen(Qt::NoPen);
-        painter.drawEllipse(food->getX() - 5, food->getY() - 5, 10, 10);
+        painter.drawEllipse(food->getX() - food->getSize().width()/2, food->getY() - food->getSize().height()/2, food->getSize().width(), food->getSize().height());
         is_Food_Generated = true;
     }else{
         painter.setBrush(Qt::red);
         painter.setPen(Qt::NoPen);
-        painter.drawEllipse(food->getX() - 5, food->getY() - 5, 10, 10);
+        painter.drawEllipse(food->getX() - food->getSize().width()/2, food->getY() - food->getSize().height()/2, food->getSize().width(), food->getSize().height());
     }
 
     // 吃到食物后，生成新的食物
@@ -60,11 +69,10 @@ void GameArea::paintEvent(QPaintEvent *event) {
         generateFood();
     }
 
-    // // 检测碰撞
-    // if(checkCollision(snake)){
-    //     stop();
-    //     emit gameOver();
-    // }
+    // 检测碰撞
+    if(checkCollision(snake)){
+        emit gameOver();
+    }
 
 
 }

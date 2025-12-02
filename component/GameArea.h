@@ -5,6 +5,7 @@
 #include "../snake/Snake.h"
 #include <QTimer>
 #include "../food/Food.h"
+#include "GameOverDialog.h"
 
 
 class GameArea : public QWidget
@@ -26,6 +27,7 @@ private:
     bool is_Running = false;
     bool is_Food_Generated = false;
     Food *food;
+    GameOverDialog *gameOverDialog;
 
 
     void generateFood();
