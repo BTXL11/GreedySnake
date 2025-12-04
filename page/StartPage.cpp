@@ -22,12 +22,16 @@ void StartPage::initUI(){
     settingsButton = new QPushButton("Settings", this);
     settingsButton->setFixedSize(200, 75);
 
+    rankingButton = new QPushButton("Ranking", this);
+    rankingButton->setFixedSize(200, 75);
+
     exitButton = new QPushButton("Exit", this);
     exitButton->setFixedSize(150, 75);
 
     mainLayout->addWidget(titleLabel, 0, Qt::AlignCenter);
     mainLayout->addWidget(startButton, 0, Qt::AlignCenter);
     mainLayout->addWidget(settingsButton, 0, Qt::AlignCenter);
+    mainLayout->addWidget(rankingButton, 0, Qt::AlignCenter);
     mainLayout->addWidget(exitButton, 0, Qt::AlignCenter);
 
     mainLayout->setAlignment(Qt::AlignCenter);
@@ -40,6 +44,9 @@ void StartPage::initConnections(){
     });
     connect(settingsButton, &QPushButton::clicked, this, [this](){
         emit StartPageSettings();     
+    });
+    connect(rankingButton, &QPushButton::clicked, this, [this](){
+        emit StartPageRanking();
     });
     connect(exitButton, &QPushButton::clicked, this, [this](){
         emit StartPageExit();

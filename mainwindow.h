@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #include "page/MiddlePage.h"
+#include "page/RankingPage.h"
 #pragma once
 
 
@@ -8,6 +9,8 @@
 #include "page/StartPage.h"
 #include "page/GamePage.h"
 #include "page/MiddlePage.h"
+#include "page/SettingPage.h"
+#include "page/RankingPage.h"
 #include <QStackedWidget>
 #include <QFile>
 
@@ -22,6 +25,8 @@ public:
 private:
     StartPage* startPage;
     GamePage* gamePage;
+    SettingPage* settingPage;
+    RankingPage* rankingPage;
     MiddlePage* middlePage;
 
     QStackedWidget* stackedWidget;

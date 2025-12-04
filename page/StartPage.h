@@ -18,6 +18,7 @@ private:
     QLabel *titleLabel;
     QPushButton *exitButton;
     QPushButton *settingsButton;
+    QPushButton *rankingButton;
 
     void initUI();
     void initConnections();
@@ -27,5 +28,6 @@ private slots:
 signals:
     void StartPageStart();
     void StartPageSettings();
+    void StartPageRanking();
     void StartPageExit();
 };

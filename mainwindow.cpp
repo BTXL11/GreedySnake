@@ -30,11 +30,15 @@ void MainWindow::initUI(){
     this->setWindowIcon(icon);
 
     startPage = new StartPage(this);
+    settingPage = new SettingPage(this);
+    rankingPage = new RankingPage(this);
     gamePage = new GamePage(this);
     middlePage = new MiddlePage(this);
 
     stackedWidget = new QStackedWidget(this);
     stackedWidget->addWidget(startPage);
+    stackedWidget->addWidget(settingPage);
+    stackedWidget->addWidget(rankingPage);
     stackedWidget->addWidget(gamePage);
     stackedWidget->addWidget(middlePage);
 
@@ -48,10 +52,22 @@ void MainWindow::initConnections(){
         stackedWidget->setCurrentWidget(middlePage);
         // gamePage->reset();
     });
+    connect(startPage, &StartPage::StartPageSettings, this, [=](){
+        stackedWidget->setCurrentWidget(settingPage);
+    });
+    connect(startPage, &StartPage::StartPageRanking, this, [=](){
+        stackedWidget->setCurrentWidget(rankingPage);
+    });
     connect(middlePage, &MiddlePage::startGame, this, [=](){
         stackedWidget->setCurrentWidget(gamePage);
     });
     connect(gamePage, &GamePage::exitGame, this, [this](){
+        stackedWidget->setCurrentWidget(startPage);
+    });
+    connect(settingPage, &SettingPage::backButtonClicked, this, [=](){
+        stackedWidget->setCurrentWidget(startPage);
+    });
+    connect(rankingPage, &RankingPage::backButtonClicked, this, [=](){
         stackedWidget->setCurrentWidget(startPage);
     });
     connect(startPage, &StartPage::StartPageExit, this, &QApplication::quit);
