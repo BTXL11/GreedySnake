@@ -38,6 +38,7 @@ void GamePage::initConnect(){
     connect(gameOverDialog, &GameOverDialog::exitGame, this, [this](){
         emit exitGame();
         gameArea->restart();
+        gameArea->stop();
     });
 }
 

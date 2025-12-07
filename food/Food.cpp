@@ -15,6 +15,7 @@ void Food::generate(int x, int y, int width, int height){
 
     foodPixmap = QPixmap(getImagePath(foodImagePath[foodType]));
 
+
     x = QRandomGenerator::global()->generate() % 680 + 20;
     y = QRandomGenerator::global()->generate() % 440 + 20;
     // width = QRandomGenerator::global()->generate() % 30 + 10;
@@ -23,6 +24,7 @@ void Food::generate(int x, int y, int width, int height){
 
     position = QPoint(x-width/2, y-height/2);
     size = QSize(Size, Size);
+    score = Size*Size / 100;
     isGenerated = true;
 
 
@@ -57,7 +59,7 @@ void Food::initFoodImagePath(){
     foodImagePath={
         {FoodType::Apple, "apple.png"},
         {FoodType::Banana, "banana.png"},
-        {FoodType::Charry, "charry.png"},
+        {FoodType::Cherry, "cherry.png"},
         {FoodType::Grape, "grape.png"},
         {FoodType::GreenGrape, "greenGrape.png"},
         {FoodType::Lemon, "lemon.png"},
@@ -77,7 +79,7 @@ Food::FoodType Food::getRandomFoodType() const{
         case 1:
             return FoodType::Banana;
         case 2:
-            return FoodType::Charry;
+            return FoodType::Cherry;
         case 3:
             return FoodType::Grape;
         case 4:
@@ -104,3 +106,8 @@ bool Food::setIsGenerated(bool value){
     isGenerated = value;
     return isGenerated;
 }
+
+int Food::getScore() const{
+    return score;
+}
+

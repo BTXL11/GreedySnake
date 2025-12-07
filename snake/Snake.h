@@ -4,8 +4,11 @@
 #include <QVector>
 #include <QPoint>
 #include "../food/Food.h"
+#include "qcontainerfwd.h"
 #include "qpoint.h"
 #include "qtmetamacros.h"
+#include <QMap>
+#include <QSet>
 
 class Snake : public QObject {
     Q_OBJECT
@@ -46,8 +49,7 @@ public:
     void eat(Food* food);
     void grow();
     void reGenerate();
-
-
+    void routePlanning(QVector<QPoint> obstacles, QVector<Food*> foods);
     
 private:
     QVector<QPoint> body;
@@ -56,6 +58,7 @@ private:
     Control control = COMMON;
     Controller controller = DISABLED;
     QPoint head;
+    int difficulty = 2;
     int speed = 100;
     int size = 10;
     int score = 0;
@@ -66,16 +69,13 @@ private:
     bool isAlive = false;
     QString name;
     QPoint initialPosition;
+    QVector<QPoint> route;
 
     void generate();
     void generate(QPoint initialPosition);
 
-    
-
-
     friend class Food;
 signals:
     void scoreChanged(int score);
-
 };
     

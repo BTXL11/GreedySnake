@@ -19,8 +19,8 @@ SettingPage::SettingPage(QTranslator *translator, QWidget *parent)
     // 配置语言下拉框（支持中、英、日、韩）
     langCombo->addItem(tr("中文"), "zh");
     langCombo->addItem(tr("English"), "en");
-    langCombo->addItem(tr("日本語"), "ja");
-    langCombo->addItem(tr("한국어"), "ko");
+    // langCombo->addItem(tr("日本語"), "ja");
+    // langCombo->addItem(tr("한국어"), "ko");
 
     // 布局管理
     QVBoxLayout *layout = new QVBoxLayout(this);

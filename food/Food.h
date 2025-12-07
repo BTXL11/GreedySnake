@@ -17,7 +17,7 @@ public:
     enum FoodType {
         Apple,
         Banana,
-        Charry,
+        Cherry,
         Grape,
         GreenGrape,
         Lemon,
@@ -37,10 +37,12 @@ public:
     void initFoodImagePath();
     bool IsGenerated() const;
     bool setIsGenerated(bool value);
+    int getScore() const;
 
 private:
     QPoint position;
     QSize size;
+    int score = 0;
     FoodType foodType;
     QPixmap foodPixmap;
     QHash<Food::FoodType, QString> foodImagePath;

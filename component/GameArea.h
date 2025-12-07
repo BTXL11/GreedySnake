@@ -53,6 +53,7 @@ private:
     void printFood(QPainter &painter, Food *food);
     void controlSnake(QKeyEvent *event, Snake *snake, Snake::Control control);
     void control(QKeyEvent *event);
+    QVector<QPoint> getObstacles() const;
 
 public slots:
     void restart();

@@ -1,13 +1,4 @@
-// #ifndef DIFFICULTYPAGE_H
-// #define DIFFICULTYPAGE_H
 
-// class DifficultyPage
-// {
-// public:
-//     DifficultyPage();
-// };
-
-// #endif // DIFFICULTYPAGE_H
 #ifndef DIFFICULTYPAGE_H
 #define DIFFICULTYPAGE_H
 

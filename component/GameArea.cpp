@@ -1,4 +1,5 @@
 #include "GameArea.h"
+#include "qcontainerfwd.h"
 #include "qevent.h"
 #include "qnamespace.h"
 #include "qpainter.h"
@@ -20,12 +21,36 @@ GameArea::GameArea(QWidget *parent) : QWidget(parent){
     foodTimer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this](){
         if(snake->IsEnabled()&&snake->IsAlive()){
+            if(snake->IsAi()){
+                QVector<Food*> foods;
+                for(auto food : this->foods){
+                    foods.append(food);
+                }
+                foods.append(this->food);
+                snake->routePlanning(getObstacles(), foods);
+            }
             snake->move();
         }
         if(snake2->IsEnabled()&&snake2->IsAlive()){
+            if(snake2->IsAi()){
+                QVector<Food*> foods;
+                for(auto food : this->foods){
+                    foods.append(food);
+                }
+                foods.append(this->food);
+                snake2->routePlanning(getObstacles(), foods);
+            }
             snake2->move();
         }
         if(snake3->IsEnabled()&&snake3->IsAlive()){
+            if(snake3->IsAi()){
+                QVector<Food*> foods;
+                for(auto food : this->foods){
+                    foods.append(food);
+                }
+                foods.append(this->food);
+                snake3->routePlanning(getObstacles(), foods);
+            }
             snake3->move();
         }
         update();
@@ -159,9 +184,9 @@ void GameArea::removeFood(Food *food){
 
 void GameArea::totalCheck(){
     // 吃到食物后，生成新的食物
-    if(checkEatFood(snake, food)){
+   if(checkEatFood(snake, food)){
         is_Food_Generated = false;
-        snake->eat(food);
+        snake->eat( food);
         generateFood();
     }
 
@@ -453,6 +478,22 @@ void GameArea::control(QKeyEvent *event){
     }
 
 }
+
+QVector<QPoint> GameArea::getObstacles() const {
+    QVector<QPoint> obstacles;
+    if(snake->IsEnabled()&&snake->IsAlive()){
+        obstacles.append(snake->getBody());
+    }
+    if(snake2->IsEnabled()&&snake2->IsAlive()){
+        obstacles.append(snake2->getBody());
+    }
+    if(snake3->IsEnabled()&&snake3->IsAlive()){
+        obstacles.append(snake3->getBody());
+    }
+    return obstacles;
+}
+
+
 
 void GameArea::setSnakeColour(int Player, Snake::Colour colour){
     if(Player == 1){

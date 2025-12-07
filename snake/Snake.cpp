@@ -2,6 +2,8 @@
 #include "qgraphicsitem.h"
 #include "qpoint.h"
 #include "qtmetamacros.h"
+#include <QQueue>
+
 
 Snake::Snake()
 {
@@ -62,6 +64,22 @@ int Snake::getSize() const
 }
 
 void Snake::move(){
+    if(controller == Snake::AI){
+        if(route.isEmpty()){
+            return;
+        }
+        QPoint next = route.first();
+        if(next.x() < head.x()){
+                direction = LEFT;
+        }else if(next.x() > head.x()){
+                direction = RIGHT;
+        }else if(next.y() < head.y()){
+                direction = UP;
+        }else if(next.y() > head.y()){
+                direction = DOWN;
+        }
+        route.remove(0);
+    }
     switch (direction) {
     case UP:
         body.insert(0, {head.x(), head.y() - speed/100});
@@ -84,6 +102,7 @@ void Snake::move(){
         head = body.first();
         break;
     }
+
 }
 
 void Snake::setDirection(Direction direction)
@@ -98,7 +117,7 @@ Snake::Direction Snake::getDirection() const
 
 void Snake::eat(Food* food)
 {
-        score += 10;
+        score += food->getScore();
         emit scoreChanged(score);
         grow();
 }
@@ -167,6 +186,167 @@ void Snake::reGenerate(){
     emit scoreChanged(score);
     generate(this->initialPosition);
 }
+
+// QPoint 哈希函数，让 QPoint 可以作为 QHash/QSet 的键
+inline uint qHash(const QPoint &key, uint seed = 0) {
+    return qHash(QPair<int,int>(key.x(), key.y()), seed);
+}
+
+// 节点结构
+struct Node {
+    QPoint pos;
+    int g; // 已走的代价
+    int h; // 启发式估计
+    int f() const { return g + h; }
+};
+
+void Snake::routePlanning(QVector<QPoint> obstacles, QVector<Food*> foods){
+    if(difficulty == 1){
+        QPoint  hithermostFood = foods.first()->getPosition();
+        for(auto food : foods){
+            if(abs(food->getPosition().x()-this->head.x())+abs(food->getPosition().y()-this->head.y()) < abs(hithermostFood.x()-this->head.x())+abs(+hithermostFood.y()-this->head.y())){
+                hithermostFood = food->getPosition();
+            }
+        }
+        QVector<QPoint> route;
+        QPoint current = head;
+        for(int i=1 ;i<= abs(hithermostFood.x()-this->head.x()) ;i++){
+            if(hithermostFood.x() > this->head.x()){
+                route.append(current += QPoint(i,0));
+            }else if(hithermostFood.x() < this->head.x()){
+                route.append(current += QPoint(-i,0));
+            }
+        }
+        for(int i=1 ;i<= abs(hithermostFood.y()-this->head.y()) ;i++){
+            if(hithermostFood.y() > this->head.y()){
+                route.append(current += QPoint(0,i));
+            }else if(hithermostFood.y() < this->head.y()){
+                route.append(current += QPoint(0,-i));
+            }
+        }
+        this->route = route;
+    }else if(difficulty == 2){
+                // 找最近的食物
+    QPoint target = foods.first()->getPosition();
+    for(auto food : foods){
+        int distFood = abs(food->getPosition().x() - head.x()) + abs(food->getPosition().y() - head.y());
+        int distCurrent = abs(target.x() - head.x()) + abs(target.y() - head.y());
+        if(distFood < distCurrent){
+            target = food->getPosition();
+        }
+    }
+
+    // 用 QSet 加快障碍查找
+    QSet<QPoint> obstacleSet(obstacles.begin(), obstacles.end());
+
+    QVector<QPoint> route;
+    QPoint current = head;
+
+    int maxSteps = 500; // 安全限制，避免死循环
+    while(current != target && maxSteps-- > 0){
+        QPoint next = current;
+
+        // 贪心靠近目标
+        if(target.x() < current.x()) next.setX(current.x() - 1);
+        else if(target.x() > current.x()) next.setX(current.x() + 1);
+        else if(target.y() < current.y()) next.setY(current.y() - 1);
+        else if(target.y() > current.y()) next.setY(current.y() + 1);
+
+        // 如果下一步是障碍，尝试绕开一格
+        if(obstacleSet.contains(next)){
+            bool moved = false;
+            QVector<QPoint> alternatives = {
+                QPoint(current.x(), current.y() + 1),
+                QPoint(current.x(), current.y() - 1),
+                QPoint(current.x() + 1, current.y()),
+                QPoint(current.x() - 1, current.y())
+            };
+            for(auto alt : alternatives){
+                if(!obstacleSet.contains(alt)){
+                    next = alt;
+                    moved = true;
+                    break;
+                }
+            }
+            if(!moved) break; // 完全绕不开，退出
+        }
+
+        route.push_back(next);
+        current = next;
+    }
+
+    this->route = route;
+    }else if(difficulty == 3){
+    
+
+    
+
+        // Step 1: 找到最近的食物
+        QPoint target = foods.first()->getPosition();
+        for(auto food : foods){
+            int distFood = abs(food->getPosition().x() - head.x()) + abs(food->getPosition().y() - head.y());
+            int distCurrent = abs(target.x() - head.x()) + abs(target.y() - head.y());
+            if(distFood < distCurrent){
+                target = food->getPosition();
+            }
+        }
+
+        // Step 2: 初始化
+        QSet<QPoint> obstacleSet(obstacles.begin(), obstacles.end());
+        QHash<QPoint, QPoint> parent;
+        QMultiMap<int, Node> open;   // 按 f 排序
+        QSet<QPoint> closed;
+
+        Node start{head, 0, abs(target.x()-head.x()) + abs(target.y()-head.y())};
+        open.insert(start.f(), start);
+        parent.insert(head, QPoint(-1,-1));
+
+        QVector<QPoint> directions = { {1,0}, {-1,0}, {0,1}, {0,-1} };
+
+        // Step 3: A* 循环
+        while(!open.isEmpty()){
+            auto it = open.begin();   // f 最小的节点
+            Node current = it.value();
+            open.erase(it);
+
+            if(closed.contains(current.pos)) continue;
+            closed.insert(current.pos);
+
+            if(current.pos == target) break;
+
+            for(auto dir : directions){
+                QPoint next = current.pos + dir;
+                if(obstacleSet.contains(next)) continue;
+                if(closed.contains(next)) continue;
+
+               int g = current.g + 1;
+               int h = abs(target.x()-next.x()) + abs(target.y()-next.y());
+                Node neighbor{next, g, h};
+
+                if(!parent.contains(next)) {
+                    parent.insert(next, current.pos);
+                    open.insert(neighbor.f(), neighbor);
+                }
+            }
+        }
+
+        // Step 4: 回溯路径，生成逐步坐标序列
+        QVector<QPoint> route;
+        QPoint step = target;
+        while(step != QPoint(-1,-1)){
+            route.push_front(step);
+            step = parent.value(step, QPoint(-1,-1));
+        }
+
+        // 去掉第一个点（就是 head 本身），避免蛇原地不动
+        if(!route.isEmpty() && route.first() == head){
+            route.removeFirst();
+        }
+
+        this->route = route;
+    }
+}
+
 
 int Snake::getSpeed() const{
     return speed;
