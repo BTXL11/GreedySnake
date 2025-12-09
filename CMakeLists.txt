@@ -36,6 +36,7 @@ qt_add_executable(GreedySnake
     page/Difficultypage.cpp
     tools/Tools.h
     tools/tools.cpp
+    compat/mingw_shim.cpp
 
 
 )
@@ -45,6 +46,7 @@ target_link_libraries(GreedySnake
         Qt::Core
         Qt::Widgets
         Qt6::Multimedia
+    "-lmingwex"
 )
 
 include(GNUInstallDirs)
