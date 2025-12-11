@@ -277,10 +277,6 @@ void Snake::routePlanning(QVector<QPoint> obstacles, QVector<Food*> foods){
 
     this->route = route;
     }else if(difficulty == 3){
-    
-
-    
-
         // Step 1: 找到最近的食物
         QPoint target = foods.first()->getPosition();
         for(auto food : foods){
@@ -405,14 +401,25 @@ void Snake::setAlive(bool isAlive){
 }
 
 QString Snake::getName() const{
-    if(!name.isEmpty()){
-        return name;
+    // if(!name.isEmpty()){
+    //     return name;
+    // }
+    // if(isAi){
+    //     return "AI";
+    // }
+    // return "Unnamed Snake";
+    if(this->isEnabled){
+        if(this->isAi){
+            return "AI";
+        }else{
+            if(this->name.isEmpty()){
+                return "Unnamed Snake";
+            }
+            return this->name;
+        }
+    }else{
+        return "Disabled Snake";
     }
-    if(isAi){
-        return "AI";
-    }
-    return "Unnamed Snake";
-    
 }
 
 void Snake::setName(QString name){

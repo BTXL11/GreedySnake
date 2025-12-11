@@ -163,3 +163,7 @@ void UpBar::addTime(){
     timeLabel->setText(Time + time.toString("hh:mm:ss"));
 }
 
+void UpBar::changeTime(int time){
+    this->time = QTime(0, 0, time);
+    timeLabel->setText(Time + this->time.toString("hh:mm:ss"));
+}

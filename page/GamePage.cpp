@@ -32,6 +32,8 @@ void GamePage::initConnect(){
     connect(gameArea, &GameArea::scoreChanged, upBar, &UpBar::changeScore);
     connect(gameArea, &GameArea::gameOver, this, [this](){
         gameOverDialog->show();
+        gameArea->backEnd();
+        upBar->changeTime(0);
     });
     connect(gameOverDialog, &GameOverDialog::restartGame, gameArea, &GameArea::restart);
     connect(gameOverDialog, &GameOverDialog::exitGame, gameArea, &GameArea::exitGame);

@@ -93,7 +93,7 @@ GameArea::GameArea(QWidget *parent) : QWidget(parent){
     });
     connect(this, &GameArea::gameOver, this, [this](){
         stop();
-        backEnd();
+        // backEnd();
 
     });
     connect(this, &GameArea::snakeCollided, this, &GameArea::snakeDied);
@@ -328,6 +328,9 @@ void GameArea::checkEatFood(Snake *snake, QVector<Food *> foods){
 
 bool GameArea::checkEatLandmine(Snake *snake, Landmine *landmine){
     bool is_Eat = false;
+    if(!snake->IsEnabled()||!snake->IsAlive()){
+        return is_Eat;
+    }
     double distance = sqrt(pow(landmine->getX() - snake->getHead().x(), 2) + pow(landmine->getY() - snake->getHead().y(), 2));
     if(distance < (snake->getSize() + landmine->getSize().width()/2)*0.8){
         is_Eat = true;
@@ -448,6 +451,8 @@ void GameArea::restart() {
         removeLandmine(landmine);
     }
     generateFood();
+    stop();
+    update();
 }
 
 void GameArea::exitGame(){
@@ -601,9 +606,16 @@ QVector<QPoint> GameArea::getObstacles() const {
 }
 
 void GameArea::backEnd(){
-    emit backEndSnakeScore(snake);
-    emit backEndSnakeScore(snake2);
-    emit backEndSnakeScore(snake3);
+    if(snake->IsEnabled()){
+        emit backEndSnakeScore(snake);
+    }
+    if(snake2->IsEnabled()){
+        emit backEndSnakeScore(snake2);
+    }
+    if(snake3->IsEnabled()){
+        emit backEndSnakeScore(snake3);
+    }
+
 }
 
 QString GameArea::getPlayerName(int Player) const{

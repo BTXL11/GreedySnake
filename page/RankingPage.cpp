@@ -225,49 +225,46 @@ void RankingPage::saveRankings(){
 
 // 接收游戏结束信号，并调用onUpdateScoreRankings()，更新排行榜，后端写的
 void RankingPage::onUpdateScoreRankings(QString name, int score){
-    // update score and date
+    if(name.isEmpty() || score == 0){
+        return;
+    }
+
     int rows = table->rowCount();
     bool updated = false;
-    for(int i=0;i<rows;i++){
-        if(table->item(i,1)->text() == name){
+
+    // 更新已有分数
+    for(int i=0; i<rows; i++){
+        if(table->item(i,1)->text() == name&&table->item(i,2)->text().toInt() < score){
             table->setItem(i, 2, new QTableWidgetItem(QString::number(score)));
             table->setItem(i, 3, new QTableWidgetItem(QDateTime::currentDateTime().toString()));
             updated = true;
             break;
         }
     }
+
+    // 插入新行
     if(!updated){
-        // add new row
-        table->insertRow(0);
-        table->setItem(0, 0, new QTableWidgetItem("1"));
-        table->setItem(0, 1, new QTableWidgetItem(name));
-        table->setItem(0, 2, new QTableWidgetItem(QString::number(score)));
-        table->setItem(0, 3, new QTableWidgetItem(QDateTime::currentDateTime().toString()));
+        int newRow = table->rowCount();
+        table->insertRow(newRow);
+        table->setItem(newRow, 1, new QTableWidgetItem(name));
+        table->setItem(newRow, 2, new QTableWidgetItem(QString::number(score)));
+        table->setItem(newRow, 3, new QTableWidgetItem(QDateTime::currentDateTime().toString()));
     }
-    for(int i=0;i<rows;i++){
-        table->item(i,0)->setText(QString::number(i+1));
+
+    // 按分数降序排序
+    table->sortItems(2, Qt::DescendingOrder);
+
+    // 更新排名列
+    rows = table->rowCount();
+    for(int i=0; i<rows; i++){
+        table->setItem(i, 0, new QTableWidgetItem(QString::number(i+1)));
     }
-    // sort by score descending
-    for(int i=0;i<rows-1;i++){
-        for(int j=i+1;j<rows;j++){
-            bool ok1, ok2;
-            int s1 = table->item(i,2)->text().toInt(&ok1);
-            int s2 = table->item(j,2)->text().toInt(&ok2);
-            if(!ok1) s1 = 0;
-            if(!ok2) s2 = 0;
-            if(s1 < s2){
-                // swap rows
-                table->insertRow(i);
-                // table->setRow(i, table->takeRow(j));
-                table->removeRow(j);
-                break;
-            }
-        }
-    }
-    // save to file
+
+    // 保存
     saveRankings();
-    
+    loadRankings();
 }
+
 
 //后端写的
 void RankingPage::changeLanguage(QString lang){

@@ -73,10 +73,11 @@ private:
     void controlSnake(QKeyEvent *event, Snake *snake, Snake::Control control);
     void control(QKeyEvent *event);
     QVector<QPoint> getObstacles() const;
-    void backEnd();
+    
 
     QString getPlayerName(int player) const;
 public slots:
+    void backEnd();
     void restart();
     void exitGame();
     void setSnakeColour(int player, Snake::Colour colour);

@@ -40,6 +40,7 @@ public slots:
     void changePlayerName(int player, QString name);
     void changeLanguage(QString language);
     void addTime();
+    void changeTime(int time);
 
 signals:
     void endGame();
